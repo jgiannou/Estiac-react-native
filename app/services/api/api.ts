@@ -44,59 +44,59 @@ export class Api {
     })
   }
 
-  /**
-   * Gets a list of users.
-   */
-  async getUsers(): Promise<Types.GetUsersResult> {
-    // make the api call
-    const response: ApiResponse<any> = await this.apisauce.get(`/users`)
+  // /**
+  //  * Gets a list of users.
+  //  */
+  // async getUsers(): Promise<Types.GetUsersResult> {
+  //   // make the api call
+  //   const response: ApiResponse<any> = await this.apisauce.get(`/users`)
 
-    // the typical ways to die when calling an api
-    if (!response.ok) {
-      const problem = getGeneralApiProblem(response)
-      if (problem) return problem
-    }
+  //   // the typical ways to die when calling an api
+  //   if (!response.ok) {
+  //     const problem = getGeneralApiProblem(response)
+  //     if (problem) return problem
+  //   }
 
-    const convertUser = (raw) => {
-      return {
-        id: raw.id,
-        name: raw.name,
-      }
-    }
+  //   const convertUser = (raw) => {
+  //     return {
+  //       id: raw.id,
+  //       name: raw.name,
+  //     }
+  //   }
 
-    // transform the data into the format we are expecting
-    try {
-      const rawUsers = response.data
-      const resultUsers: Types.User[] = rawUsers.map(convertUser)
-      return { kind: "ok", users: resultUsers }
-    } catch {
-      return { kind: "bad-data" }
-    }
-  }
+  //   // transform the data into the format we are expecting
+  //   try {
+  //     const rawUsers = response.data
+  //     const resultUsers: Types.User[] = rawUsers.map(convertUser)
+  //     return { kind: "ok", users: resultUsers }
+  //   } catch {
+  //     return { kind: "bad-data" }
+  //   }
+  // }
 
   /**
    * Gets a single user by ID
    */
 
-  async getUser(id: string): Promise<Types.GetUserResult> {
-    // make the api call
-    const response: ApiResponse<any> = await this.apisauce.get(`/users/${id}`)
+  // async getUser(id: string): Promise<Types.GetUserResult> {
+  //   // transform the data into the format we are expecting
+  //   try {
+  //     // make the api call
+  //     const response: ApiResponse<any> = await this.apisauce.get(`/users/${id}`)
+  //     console.log("asdasdasdasdasd", response)
 
-    // the typical ways to die when calling an api
-    if (!response.ok) {
-      const problem = getGeneralApiProblem(response)
-      if (problem) return problem
-    }
+  //     // the typical ways to die when calling an api
+  //     if (!response.ok) {
+  //       console.log("asdasdasdasdasd", response)
 
-    // transform the data into the format we are expecting
-    try {
-      const resultUser: Types.User = {
-        id: response.data.id,
-        name: response.data.name,
-      }
-      return { kind: "ok", user: resultUser }
-    } catch {
-      return { kind: "bad-data" }
-    }
-  }
+  //       const problem = getGeneralApiProblem(response)
+  //       if (problem) return problem
+  //     }
+
+  //     const user = response.data.resuts
+  //     return { kind: "ok", user }
+  //   } catch {
+  //     return { kind: "bad-data" }
+  //   }
+  // }
 }

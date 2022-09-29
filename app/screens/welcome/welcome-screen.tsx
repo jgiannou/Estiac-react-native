@@ -1,4 +1,4 @@
-import React, { FC } from "react"
+import React, { FC, useEffect, useState } from "react"
 import { View, ViewStyle, TextStyle, ImageStyle, SafeAreaView } from "react-native"
 import { StackScreenProps } from "@react-navigation/stack"
 import { observer } from "mobx-react-lite"
@@ -9,11 +9,15 @@ import {
   Text,
   GradientBackground,
   AutoImage as Image,
+  FormRow,
+  TextField,
 } from "../../components"
 import { color, spacing, typography } from "../../theme"
 import { NavigatorParamList } from "../../navigators"
+import { UserStoreModel } from "../../models/user-store/user-store"
+import { useStores } from "../../models"
 
-const bowserLogo = require("./bowser.png")
+const estiaCLogo = require("../../../assets/images/logo.png")
 
 const FULL: ViewStyle = { flex: 1 }
 const CONTAINER: ViewStyle = {
@@ -59,8 +63,9 @@ const BOWSER: ImageStyle = {
   alignSelf: "center",
   marginVertical: spacing[5],
   maxWidth: "100%",
-  width: 343,
+  width: "100%",
   height: 230,
+  resizeMode: "contain",
 }
 const CONTENT: TextStyle = {
   ...TEXT,
@@ -72,7 +77,8 @@ const CONTENT: TextStyle = {
 const CONTINUE: ViewStyle = {
   paddingVertical: spacing[4],
   paddingHorizontal: spacing[4],
-  backgroundColor: color.palette.deepPurple,
+  backgroundColor: color.palette.fancySkin,
+  borderRadius: 20,
 }
 const CONTINUE_TEXT: TextStyle = {
   ...TEXT,
@@ -80,7 +86,7 @@ const CONTINUE_TEXT: TextStyle = {
   fontSize: 13,
   letterSpacing: 2,
 }
-const FOOTER: ViewStyle = { backgroundColor: "#20162D" }
+const FOOTER: ViewStyle = { backgroundColor: color.transparent }
 const FOOTER_CONTENT: ViewStyle = {
   paddingVertical: spacing[4],
   paddingHorizontal: spacing[4],
@@ -88,11 +94,21 @@ const FOOTER_CONTENT: ViewStyle = {
 
 export const WelcomeScreen: FC<StackScreenProps<NavigatorParamList, "welcome">> = observer(
   ({ navigation }) => {
-    const nextScreen = () => navigation.navigate("demo")
+    const [password, setPassword] = useState("")
 
+    const nextScreen = () => {
+      navigation.navigate("demo")
+    }
+    const { userStore } = useStores()
+    const { user } = userStore
+    const login = async () => {
+      await userStore.getUser(password)
+      use && nextScreen()
+    }
+    console.log(user)
     return (
       <View testID="WelcomeScreen" style={FULL}>
-        <GradientBackground colors={["#422443", "#281b34"]} />
+        <GradientBackground colors={["#FFEFPQ", "#FFFFFF"]} />
         <Screen style={CONTAINER} preset="scroll" backgroundColor={color.transparent}>
           <Header headerTx="welcomeScreen.poweredBy" style={HEADER} titleStyle={HEADER_TITLE} />
           <Text style={TITLE_WRAPPER}>
@@ -101,7 +117,7 @@ export const WelcomeScreen: FC<StackScreenProps<NavigatorParamList, "welcome">> 
             <Text style={TITLE} text="!" />
           </Text>
           <Text style={TITLE} preset="header" tx="welcomeScreen.readyForLaunch" />
-          <Image source={bowserLogo} style={BOWSER} />
+          <Image source={estiaCLogo} style={BOWSER} />
           <Text style={CONTENT}>
             This probably isn't what your app is going to look like. Unless your designer handed you
             this screen and, in that case, congrats! You're ready to ship.
@@ -113,12 +129,15 @@ export const WelcomeScreen: FC<StackScreenProps<NavigatorParamList, "welcome">> 
         </Screen>
         <SafeAreaView style={FOOTER}>
           <View style={FOOTER_CONTENT}>
+            <FormRow preset={"top"}>
+              <TextField placeholder={password} onChangeText={(e) => setPassword(e)} label={"id"} />
+            </FormRow>
             <Button
               testID="next-screen-button"
               style={CONTINUE}
               textStyle={CONTINUE_TEXT}
               tx="welcomeScreen.continue"
-              onPress={nextScreen}
+              onPress={login}
             />
           </View>
         </SafeAreaView>
