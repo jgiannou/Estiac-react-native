@@ -1,5 +1,5 @@
 {
     "users": {
-      "id":  { "string": "test" }
+ "id":  { "string": {} }
     }
   }
