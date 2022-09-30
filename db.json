@@ -1,8 +1,16 @@
 {
-    "users": {
+    "users": [
+        {
       "password": "121068",
       "username": "jgiann",
       "name": "giannis",
       "email": "jgiann@estiac.com"
-    }
+    },
+          {
+      "password": "1994",
+      "username": "jgiann",
+      "name": "test",
+      "email": "test@estiac.com"
+    },
+        ]
   }
