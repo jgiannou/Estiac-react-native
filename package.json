@@ -104,6 +104,7 @@
     "metro-config": "0.71.1",
     "metro-react-native-babel-preset": "0.71.1",
     "metro-source-map": "0.71.1",
+    "miragejs": "^0.1.45",
     "mocha": "6",
     "patch-package": "6.4.7",
     "postinstall-prepare": "1.0.1",

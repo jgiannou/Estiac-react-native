@@ -4,10 +4,11 @@ import { Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree"
  * User model.
  */
 export const UserModel = types.model("User").props({
-  id: types.maybe(types.string),
+  password: types.maybe(types.string),
   name: types.maybe(types.string),
   username: types.maybe(types.string),
   email: types.maybe(types.string),
+  status: types.maybe(types.boolean),
 })
 
 export interface User extends Instance<typeof UserModel> {}

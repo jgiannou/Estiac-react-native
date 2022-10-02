@@ -10,11 +10,12 @@ export class UserApi {
     this.api = api
   }
 
-  async getUser(id: string): Promise<GetUserResult> {
+  async getUser(password: string, email: string): Promise<GetUserResult> {
     try {
       // make the api call
-      const response: ApiResponse<any> = await this.api.apisauce.get(`/users/${id}`)
-
+      const response: ApiResponse<any> = await this.api.apisauce.get(
+        `/users?password=${password}&email=${email}`,
+      )
       // the typical ways to die when calling an api
       if (!response.ok) {
         const problem = getGeneralApiProblem(response)
@@ -22,12 +23,13 @@ export class UserApi {
       }
 
       const user = {
-        id: response.data.id,
-        name: response.data.name,
-        username: response.data.username,
-        email: response.data.email,
+        password: response.data[0].password,
+        name: response.data[0].name,
+        username: response.data[0].username,
+        email: response.data[0].email,
+        status: response.ok,
       }
-
+      console.group("service api get use called")
       return { kind: "ok", user }
     } catch (e) {
       __DEV__ && console.tron.log(e.message)
