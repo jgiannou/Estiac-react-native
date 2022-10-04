@@ -10,7 +10,9 @@
   "welcomeScreen": {
     "poweredBy": "POWERED BY JOHGIAN",
     "readyForLaunch": "Ready for launch.",
-    "continue": "GET STARTED"
+    "continue": "GET STARTED",
+    "login": "LOGIN",
+    "logout": "LOGOUT"
   },
   "demoScreen": {
     "howTo": "HOW TO",

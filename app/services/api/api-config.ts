@@ -22,6 +22,6 @@ export interface ApiConfig {
  * The default configuration for the app.
  */
 export const DEFAULT_API_CONFIG: ApiConfig = {
-  url: "https://my-json-server.typicode.com/jgiannou/Estiac-react-native",
+  url: "http://192.168.2.41:1337",
   timeout: 10000,
 }

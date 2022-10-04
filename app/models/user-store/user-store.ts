@@ -1,4 +1,3 @@
-import { reset } from "i18n-js"
 import { Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree"
 import { useState } from "react"
 import { UserApi } from "../../services/api/user-api"
@@ -19,10 +18,11 @@ export const UserStoreModel = types
   .actions((self) => ({
     saveUser: (userSnapshots: UserSnapshotOut) => {
       self.user = {
-        password: userSnapshots?.password,
-        name: userSnapshots?.name,
+        id: userSnapshots?.id,
         username: userSnapshots?.username,
+        avatarSrc: userSnapshots?.avatarSrc,
         email: userSnapshots?.email,
+        jwt: userSnapshots?.jwt,
         status: userSnapshots?.status,
       }
     },
@@ -31,10 +31,11 @@ export const UserStoreModel = types
     resetUser: () => {
       console.log("reset")
       ;(self.user = {
-        password: "",
-        name: "",
+        id: undefined,
         username: "",
+        avatarSrc: "",
         email: "",
+        jwt: "",
         status: false,
       }),
         (self.isAuth = false)
@@ -47,7 +48,6 @@ export const UserStoreModel = types
   }))
   .actions((self) => ({
     getUser: async (password: string, email: string) => {
-      console.log("store get user called")
       self.resetUser()
       const userApi = new UserApi(self.environment.api)
       const result = await userApi.getUser(password, email)

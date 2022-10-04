@@ -1,0 +1,53 @@
+{
+  "kind": "collectionType",
+  "collectionName": "estias",
+  "info": {
+    "singularName": "estia",
+    "pluralName": "estias",
+    "displayName": "Estia"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "category": {
+      "type": "enumeration",
+      "enum": [
+        "cafe",
+        "restaurant",
+        "bar",
+        "club"
+      ]
+    },
+    "address": {
+      "type": "string"
+    },
+    "avatar": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": false
+    },
+    "photos": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": true
+    },
+    "description": {
+      "type": "string"
+    }
+  }
+}

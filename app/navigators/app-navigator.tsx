@@ -11,6 +11,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { WelcomeScreen, DemoScreen, DemoListScreen } from "../screens"
 import { navigationRef, useBackButtonHandler } from "./navigation-utilities"
 import { DemoMapScreen } from "../screens/demo-map/demo-map-screen"
+import { EstiaScreen } from "../screens/estia/estia-screen"
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -29,6 +30,7 @@ export type NavigatorParamList = {
   demo: undefined
   demoList: undefined
   demoMap: undefined
+  estia: { estiaId: number }
   // 🔥 Your screens go here
 }
 
@@ -47,6 +49,7 @@ const AppStack = () => {
       <Stack.Screen name="demo" component={DemoScreen} />
       <Stack.Screen name="demoList" component={DemoListScreen} />
       <Stack.Screen name="demoMap" component={DemoMapScreen} />
+      <Stack.Screen name="estia" component={EstiaScreen} />
       {/** 🔥 Your screens go here */}
     </Stack.Navigator>
   )

@@ -1,17 +1,19 @@
-import React, { FC } from "react"
-import { Dimensions, TextStyle, View, ViewStyle } from "react-native"
+import React, { FC, useEffect, useState } from "react"
+import { ActivityIndicator, Dimensions, TextStyle, View, ViewStyle } from "react-native"
 import { StackScreenProps } from "@react-navigation/stack"
 import { observer } from "mobx-react-lite"
-import { Header, Screen, GradientBackground } from "../../components"
+import { Header, Screen, GradientBackground, Text } from "../../components"
 import { NavigatorParamList } from "../../navigators"
 import { color, spacing } from "../../theme"
-import { Api } from "../../services/api"
-import { save } from "../../utils/storage"
-import MapView from "react-native-maps"
+import * as Location from "expo-location"
+import MapView, { Callout, Marker, PROVIDER_GOOGLE } from "react-native-maps"
+import { useStores } from "../../models"
+import { StyledMapMarker } from "../../components/styled-map-marker/styled-map-marker"
+import { TouchableHighlight } from "react-native-gesture-handler"
 
 const FULL: ViewStyle = { flex: 1 }
 const CONTAINER: ViewStyle = {
-  backgroundColor: color.transparent,
+  backgroundColor: color.palette.white,
   paddingHorizontal: spacing[4],
 }
 const BOLD: TextStyle = { fontWeight: "bold" }
@@ -38,34 +40,104 @@ const MAP: TextStyle = {
   height: Dimensions.get("window").height,
 }
 
+const LOADER_CONTAINER: ViewStyle = {
+  flex: 1,
+  justifyContent: "center",
+  alignItems: "center",
+}
+
+const LOADER = {
+  flexDirection: "row",
+  justifyContent: "space-around",
+  padding: 10,
+}
+
 export const DemoMapScreen: FC<StackScreenProps<NavigatorParamList, "demoMap">> = observer(
   ({ navigation }) => {
+    const [location, setLocation] = useState(null)
+    const [errorMsg, setErrorMsg] = useState(null)
+    const [estias, setEstias] = useState([])
+    const [addresses, setAddresses] = useState([])
+
+    const { estiaStore } = useStores()
+
     const goBack = () => navigation.goBack()
 
+    const getEstias = (estias) => {
+      const newEstias = estias.map(async (estia) => {
+        let location = await Location.geocodeAsync(estia?.address)
+        return {
+          ...estia,
+          latitude: location[0]?.latitude,
+          longitude: location[0]?.longitude,
+        }
+      })
+      Promise.all(newEstias).then(setEstias)
+    }
+
+    useEffect(() => {
+      ;(async () => {
+        let { status } = await Location.requestForegroundPermissionsAsync()
+        if (status !== "granted") {
+          setErrorMsg("Permission to access location was denied")
+          return
+        }
+
+        let location = await Location.getCurrentPositionAsync({})
+        setLocation(location)
+        await estiaStore.getEstias()
+
+        getEstias(estiaStore?.estias)
+      })()
+    }, [estiaStore.estias])
     return (
       <View testID="DemoMapScreen" style={FULL}>
         <GradientBackground colors={["#422443", "#281b34"]} />
-        <Screen style={CONTAINER} preset="scroll" backgroundColor={color.transparent}>
+        <Screen style={CONTAINER} preset="scroll" backgroundColor={color.palette.white}>
           <Header
             headerTx="demoScreen.howTo"
             leftIcon="back"
             onLeftPress={goBack}
+            rightIcon={"profile"}
             style={HEADER}
             titleStyle={HEADER_TITLE}
           />
           <View style={MAP_WRAPPER}>
-            {/* <Text style={LOVE} text="Made with" />
-            <Image source={heart} style={HEART} />
-            <Text style={LOVE} text="by Infinite Red" /> */}
-            <MapView
-              style={MAP}
-              initialRegion={{
-                latitude: 37.78825,
-                longitude: -122.4324,
-                latitudeDelta: 0.0922,
-                longitudeDelta: 0.0421,
-              }}
-            />
+            {!location ? (
+              <Screen style={LOADER_CONTAINER}>
+                <ActivityIndicator size="large" />
+                <Text preset="default" style={{ color: "black" }} text="Loading" />
+              </Screen>
+            ) : (
+              <MapView
+                style={MAP}
+                provider={PROVIDER_GOOGLE}
+                initialRegion={{
+                  latitude: location?.coords?.latitude,
+                  longitude: location?.coords?.longitude,
+                  latitudeDelta: 0.0421,
+                  longitudeDelta: 0.0421,
+                }}
+              >
+                <>
+                  {estias.length > 0 &&
+                    estias?.map((estia, index) => {
+                      return (
+                        <Marker
+                          key={index}
+                          coordinate={{
+                            latitude: estia?.latitude,
+                            longitude: estia?.longitude,
+                          }}
+                          onPress={() => navigation.navigate("estia", { estiaId: estia.id })}
+                        >
+                          <StyledMapMarker text={estia?.name} image={estia?.avatar} />
+                        </Marker>
+                      )
+                    })}
+                </>
+              </MapView>
+            )}
           </View>
         </Screen>
       </View>

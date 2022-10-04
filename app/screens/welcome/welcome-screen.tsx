@@ -21,11 +21,11 @@ const estiaCLogo = require("../../../assets/images/logo.png")
 
 const FULL: ViewStyle = { flex: 1 }
 const CONTAINER: ViewStyle = {
-  backgroundColor: color.transparent,
+  backgroundColor: color.background,
   paddingHorizontal: spacing[4],
 }
 const TEXT: TextStyle = {
-  color: color.palette.white,
+  color: color.palette.black,
   fontFamily: typography.primary,
 }
 const BOLD: TextStyle = { fontWeight: "bold" }
@@ -66,13 +66,6 @@ const BOWSER: ImageStyle = {
   width: "100%",
   resizeMode: "contain",
 }
-const CONTENT: TextStyle = {
-  ...TEXT,
-  color: "#BAB6C8",
-  fontSize: 15,
-  lineHeight: 22,
-  marginBottom: spacing[5],
-}
 const CONTINUE: ViewStyle = {
   paddingVertical: spacing[4],
   paddingHorizontal: spacing[4],
@@ -87,9 +80,22 @@ const CONTINUE_TEXT: TextStyle = {
   fontSize: 13,
   letterSpacing: 2,
 }
-const FOOTER: ViewStyle = { backgroundColor: color.transparent }
-const FOOTER_CONTENT: ViewStyle = {
-  paddingVertical: spacing[4],
+const FORM_TEXT_FIELD_INPUT: TextStyle = {
+  fontSize: 17,
+  lineHeight: 17,
+  paddingVertical: spacing[0],
+  marginVertical: spacing[0],
+}
+const FORM_TEXT_FIELD: ViewStyle = {
+  paddingVertical: spacing[0],
+  marginVertical: spacing[0],
+  padding: 0,
+  margin: 0,
+}
+
+const FORM_ROW: ViewStyle = {
+  marginVertical: spacing[2],
+  padding: spacing[1],
 }
 
 export const WelcomeScreen: FC<StackScreenProps<NavigatorParamList, "welcome">> = observer(
@@ -99,68 +105,56 @@ export const WelcomeScreen: FC<StackScreenProps<NavigatorParamList, "welcome">> 
     const [showError, setShowError] = useState(false)
     const [user, setUser] = useState<User>(undefined)
     const nextScreen = () => {
-      navigation.navigate("demo")
+      navigation.navigate("demoMap")
     }
     const { userStore } = useStores()
     const login = async () => {
       await userStore.getUser(password, email)
       user.status == undefined ? setShowError(true) : setShowError(false)
     }
+    const logout = () => {
+      userStore.resetUser()
+    }
     useEffect(() => {
       setUser(userStore.user)
-      if (userStore.isAuth === true) {
+      if (userStore?.isAuth === true && user?.jwt != "") {
         nextScreen()
       }
-    }, [userStore.isAuth, user.status])
-
+    }, [userStore?.isAuth, user?.status])
     return (
       <View testID="WelcomeScreen" style={FULL}>
         <GradientBackground colors={["#FFEFPQ", "#FFFFFF"]} />
         <Screen style={CONTAINER} preset="fixed" backgroundColor={color.transparent}>
           <Header headerTx="welcomeScreen.poweredBy" style={HEADER} titleStyle={HEADER_TITLE} />
-          <Text style={TITLE_WRAPPER}>
-            <Text style={TITLE} text="Your new app, " />
-            <Text style={ALMOST} text="almost" />
-            <Text style={TITLE} text="!" />
-          </Text>
           <Text style={TITLE} preset="header" tx="welcomeScreen.readyForLaunch" />
           <Image source={estiaCLogo} style={BOWSER} />
-          <FormRow preset="soloRound">
+          <FormRow preset="soloRound" style={FORM_ROW}>
             <TextField
-              placeholder={email}
+              placeholder={"Email"}
               onChangeText={(email) => setEmail(email)}
-              label={"email"}
+              value={email}
+              inputStyle={FORM_TEXT_FIELD_INPUT}
+              style={FORM_TEXT_FIELD}
             />
+          </FormRow>
+          <FormRow preset="soloRound" style={FORM_ROW}>
             <TextField
-              placeholder={password}
+              placeholder={"Password"}
               onChangeText={(password) => setPassword(password)}
-              label={"id"}
+              value={password}
+              inputStyle={FORM_TEXT_FIELD_INPUT}
+              style={FORM_TEXT_FIELD}
             />
           </FormRow>
           <Button
             testID="next-screen-button"
             style={CONTINUE}
             textStyle={CONTINUE_TEXT}
-            tx="welcomeScreen.continue"
-            onPress={login}
+            tx={`welcomeScreen.${userStore?.isAuth ? "logout" : "login"}`}
+            onPress={userStore?.isAuth ? logout : login}
           />
           {showError && <Text style={ALMOST} text="Wrong email or password. Try Again!" />}
         </Screen>
-        {/* <SafeAreaView style={FOOTER}>
-          <View style={FOOTER_CONTENT}>
-            <FormRow preset="middle">
-              <TextField placeholder={email} onChangeText={(e) => setEmail(e)} label={"email"} />
-              <TextField placeholder={password} onChangeText={(e) => setPassword(e)} label={"id"} />
-            </FormRow>
-            <Button
-              testID="next-screen-button"
-              style={CONTINUE}
-              textStyle={CONTINUE_TEXT}
-              tx="welcomeScreen.continue"
-              onPress={login}
-            />
-          </View>
-        </SafeAreaView> */}
       </View>
     )
   },

@@ -1,5 +1,6 @@
 import { Instance, SnapshotOut, types } from "mobx-state-tree"
 import { CharacterStoreModel } from "../character-store/character-store"
+import { EstiaStoreModel } from "../estia-store/estia-store"
 import { UserStoreModel } from "../user-store/user-store"
 
 /**
@@ -8,7 +9,8 @@ import { UserStoreModel } from "../user-store/user-store"
 // prettier-ignore
 export const RootStoreModel = types.model("RootStore").props({
   characterStore: types.optional(CharacterStoreModel, {} as any),
-  userStore: types.optional(UserStoreModel, {} as any)
+  userStore: types.optional(UserStoreModel, {} as any),
+  estiaStore:  types.optional(EstiaStoreModel, {} as any),
 })
 
 /**
