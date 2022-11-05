@@ -9,7 +9,6 @@ import * as Location from "expo-location"
 import MapView, { Callout, Marker, PROVIDER_GOOGLE } from "react-native-maps"
 import { useStores } from "../../models"
 import { StyledMapMarker } from "../../components/styled-map-marker/styled-map-marker"
-import { TouchableHighlight } from "react-native-gesture-handler"
 
 const FULL: ViewStyle = { flex: 1 }
 const CONTAINER: ViewStyle = {
@@ -57,11 +56,8 @@ export const DemoMapScreen: FC<StackScreenProps<NavigatorParamList, "demoMap">> 
     const [location, setLocation] = useState(null)
     const [errorMsg, setErrorMsg] = useState(null)
     const [estias, setEstias] = useState([])
-    const [addresses, setAddresses] = useState([])
 
     const { estiaStore } = useStores()
-
-    const goBack = () => navigation.goBack()
 
     const getEstias = (estias) => {
       const newEstias = estias.map(async (estia) => {
@@ -82,11 +78,9 @@ export const DemoMapScreen: FC<StackScreenProps<NavigatorParamList, "demoMap">> 
           setErrorMsg("Permission to access location was denied")
           return
         }
-
         let location = await Location.getCurrentPositionAsync({})
         setLocation(location)
         await estiaStore.getEstias()
-
         getEstias(estiaStore?.estias)
       })()
     }, [estiaStore.estias])
@@ -96,8 +90,9 @@ export const DemoMapScreen: FC<StackScreenProps<NavigatorParamList, "demoMap">> 
         <Screen style={CONTAINER} preset="scroll" backgroundColor={color.palette.white}>
           <Header
             headerTx="demoScreen.howTo"
-            leftIcon="back"
-            onLeftPress={goBack}
+            leftIcon="menu"
+            onLeftPress={() => navigation.getParent("LeftDrawer").openDrawer()}
+            onRightPress={() => navigation.getParent("RightDrawer").openDrawer()}
             rightIcon={"profile"}
             style={HEADER}
             titleStyle={HEADER_TITLE}
@@ -129,7 +124,7 @@ export const DemoMapScreen: FC<StackScreenProps<NavigatorParamList, "demoMap">> 
                             latitude: estia?.latitude,
                             longitude: estia?.longitude,
                           }}
-                          onPress={() => navigation.navigate("estia", { estiaId: estia.id })}
+                          onPress={() => navigation.navigate("estia", { estiaId: estia?.id })}
                         >
                           <StyledMapMarker text={estia?.name} image={estia?.avatar} />
                         </Marker>

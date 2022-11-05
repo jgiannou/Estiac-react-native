@@ -1,6 +1,6 @@
 import { ApiResponse } from "apisauce"
 import { Api } from "./api"
-import { GetUserResult } from "./api.types"
+import { DEFAULT_API_CONFIG } from "./api-config"
 import { getGeneralApiProblem } from "./api-problem"
 
 export class UserApi {
@@ -10,30 +10,20 @@ export class UserApi {
     this.api = api
   }
 
-  async getUser(password: string, email: string): Promise<any> {
+  async getUserById(id: number): Promise<any> {
     try {
-      const authData = {
-        identifier: email,
-        password: `${password}`,
-      }
       // make the api call
-      const response: ApiResponse<any> = await this.api.apisauce.post(
-        `/api/auth/local`,
-        JSON.stringify(authData),
-      )
+      const response: ApiResponse<any> = await this.api.apisauce.get(`/api/users/${id}?populate=*`)
       // the typical ways to die when calling an api
-      console.log(response.data)
       if (!response.ok) {
         const problem = getGeneralApiProblem(response)
         if (problem) return problem
       }
-
       const user = {
-        id: response?.data?.user?.id,
-        username: response?.data?.user?.username,
-        email: response?.data?.user?.email,
-        avatarSrc: response?.data?.user?.avatar,
-        jwt: response?.data?.jwt,
+        id: response?.data?.id,
+        username: response?.data?.username,
+        email: response?.data?.email,
+        avatarSrc: DEFAULT_API_CONFIG.url + response?.data?.avatar?.url,
         status: response?.ok,
       }
       return { kind: "ok", user }

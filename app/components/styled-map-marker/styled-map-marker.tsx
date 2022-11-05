@@ -1,6 +1,5 @@
 import React from "react"
 import { Image, View } from "react-native"
-import { Text } from "../text/text"
 
 /**
  * A component which has a label and an input together.

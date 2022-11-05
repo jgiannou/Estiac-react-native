@@ -6,6 +6,9 @@ import { Text } from "../text/text"
 import { Icon } from "../icon/icon"
 import { color, spacing } from "../../theme"
 import { translate } from "../../i18n/"
+import { useStores } from "../../models"
+import { AutoImage } from "../auto-image/auto-image"
+import { Avatar } from "react-native-ui-lib"
 
 // static styles
 const ROOT: ViewStyle = {
@@ -36,6 +39,7 @@ export function Header(props: HeaderProps) {
     titleStyle,
   } = props
   const header = headerText || (headerTx && translate(headerTx)) || ""
+  const { userStore } = useStores()
 
   return (
     <View style={[ROOT, style]}>
@@ -51,7 +55,7 @@ export function Header(props: HeaderProps) {
       </View>
       {rightIcon ? (
         <Button preset="link" onPress={onRightPress}>
-          <Icon icon={rightIcon} />
+          <Avatar animate source={{ uri: userStore?.user?.avatarSrc }} size={50} />
         </Button>
       ) : (
         <View style={RIGHT} />

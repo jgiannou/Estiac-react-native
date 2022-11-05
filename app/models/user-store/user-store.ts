@@ -47,10 +47,11 @@ export const UserStoreModel = types
     },
   }))
   .actions((self) => ({
-    getUser: async (password: string, email: string) => {
+    getUserById: async (id: number) => {
       self.resetUser()
       const userApi = new UserApi(self.environment.api)
-      const result = await userApi.getUser(password, email)
+      const result = await userApi.getUserById(id)
+      console.log("getUserBy", result)
       if (result.kind === "ok") {
         self.saveUser(result.user)
         self.getAuth(true)

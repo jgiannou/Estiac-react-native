@@ -1,14 +1,11 @@
 import React, { FC, useEffect, useState } from "react"
-import { ActivityIndicator, Dimensions, ImageStyle, TextStyle, View, ViewStyle } from "react-native"
+import { ImageStyle, TextStyle, View, ViewStyle } from "react-native"
 import { StackScreenProps } from "@react-navigation/stack"
 import { observer } from "mobx-react-lite"
 import { Header, Screen, GradientBackground, Text, AutoImage } from "../../components"
 import { NavigatorParamList } from "../../navigators"
 import { color, spacing } from "../../theme"
-import * as Location from "expo-location"
-import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
 import { useStores } from "../../models"
-import { StyledMapMarker } from "../../components/styled-map-marker/styled-map-marker"
 
 const FULL: ViewStyle = { flex: 1 }
 const CONTAINER: ViewStyle = {
@@ -41,13 +38,12 @@ export const EstiaScreen: FC<StackScreenProps<NavigatorParamList, "estia">> = ob
       alignSelf: "center",
       maxWidth: "100%",
       width: "100%",
-      resizeMode: "contain",
+      resizeMode: "cover",
     }
 
     useEffect(() => {
       setEstia(estiaStore.getEstiaById(estiaId))
     }, [estiaStore])
-    console.log(estia)
     return (
       <View testID="EstiaScreen" style={FULL}>
         <GradientBackground colors={["#422443", "#281b34"]} />
