@@ -25,6 +25,21 @@ export const AuthenticationStoreModel = types
     },
   }))
   .actions((self) => ({
+    register: flow(function* (username: string, email: string, password: string) {
+      self.setStatus("pending")
+      self.setStatus("pending")
+      const authenticationApi = new AuthenticationApi(self.environment.api)
+      const result: LoginResult = yield authenticationApi.register(username, email, password)
+
+      if (result.kind === "ok") {
+        self.setStatus("done")
+        self.setAuthenticated(true, result.jwt, result.id)
+      } else {
+        self.setStatus("error")
+        self.setAuthenticated(false, "", undefined)
+        __DEV__ && console.tron.log(result.kind)
+      }
+    }),
     login: flow(function* (emailAddress: string, password: string) {
       self.setStatus("pending")
 
@@ -36,17 +51,17 @@ export const AuthenticationStoreModel = types
         self.setAuthenticated(true, result.jwt, result.id)
       } else {
         self.setStatus("error")
-        self.setAuthenticated(false, "", null)
+        self.setAuthenticated(false, "", undefined)
         __DEV__ && console.tron.log(result.kind)
       }
     }),
 
-    logout() {
+    logout: flow(function* () {
       self.setStatus("pending")
 
       self.setStatus("done")
-      self.setAuthenticated(false, "")
-    },
+      self.setAuthenticated(false, "", undefined)
+    }),
   }))
 
 type AuthenticationStoreType = Instance<typeof AuthenticationStoreModel>

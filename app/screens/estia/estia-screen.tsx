@@ -1,11 +1,12 @@
 import React, { FC, useEffect, useState } from "react"
-import { ImageStyle, TextStyle, View, ViewStyle } from "react-native"
+import { ImageStyle, ScrollView, TextStyle, View, ViewStyle } from "react-native"
 import { StackScreenProps } from "@react-navigation/stack"
 import { observer } from "mobx-react-lite"
 import { Header, Screen, GradientBackground, Text, AutoImage } from "../../components"
 import { NavigatorParamList } from "../../navigators"
 import { color, spacing } from "../../theme"
 import { useStores } from "../../models"
+import { Carousel, Fader, FaderPosition } from "react-native-ui-lib"
 
 const FULL: ViewStyle = { flex: 1 }
 const CONTAINER: ViewStyle = {
@@ -43,7 +44,8 @@ export const EstiaScreen: FC<StackScreenProps<NavigatorParamList, "estia">> = ob
 
     useEffect(() => {
       setEstia(estiaStore.getEstiaById(estiaId))
-    }, [estiaStore])
+    }, [estiaStore.estias])
+
     return (
       <View testID="EstiaScreen" style={FULL}>
         <GradientBackground colors={["#422443", "#281b34"]} />
@@ -56,7 +58,24 @@ export const EstiaScreen: FC<StackScreenProps<NavigatorParamList, "estia">> = ob
             style={HEADER}
             titleStyle={HEADER_TITLE}
           />
-          <AutoImage source={{ uri: estia?.avatar }} style={IMAGE} />
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            showsHorizontalScrollIndicator={false}
+            scrollEventThrottle={16}
+          >
+            <Carousel
+              key={3}
+              //loop
+              autoplay={true}
+              containerStyle={{ height: 500 }}
+              allowAccessibleLayout
+            >
+              {estia?.photos.map((item, index) => {
+                return <AutoImage source={{ uri: item?.url }} key={index} style={IMAGE} />
+              })}
+            </Carousel>
+            <Fader visible={true} position={FaderPosition.BOTTOM} tintColor={undefined} />
+          </ScrollView>
           <Text text={estia?.description} style={{ color: "black", marginVertical: spacing[2] }} />
         </Screen>
       </View>

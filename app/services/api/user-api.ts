@@ -1,4 +1,6 @@
 import { ApiResponse } from "apisauce"
+import { Platform } from "react-native"
+import { cos } from "react-native-reanimated"
 import { Api } from "./api"
 import { DEFAULT_API_CONFIG } from "./api-config"
 import { getGeneralApiProblem } from "./api-problem"
@@ -28,6 +30,39 @@ export class UserApi {
       }
       return { kind: "ok", user }
     } catch (e) {
+      __DEV__ && console.tron.log(e.message)
+      return { kind: "bad-data" }
+    }
+  }
+  async uploadUserAvatar(file: string, userId: number): Promise<any> {
+    try {
+      const formData = new FormData()
+
+      file != null &&
+        formData.append("files", {
+          name: "test.jpg",
+          type: "image/jpeg",
+          uri: Platform.OS === "ios" ? file.replace("file://", "") : file,
+        })
+      const response = await this.api.apisauce.post("/api/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        transformRequest: (formData) => formData,
+      })
+      if (response?.data[0].id != undefined) {
+        const formData = new FormData()
+        formData.append("refId", `${userId}`)
+        formData.append("ref", "users")
+        formData.append("field", "avatar")
+        const data = JSON.stringify({
+          avatar: response?.data[0].id,
+        })
+
+        return await this.api.apisauce.put(`/api/users/${userId}`, data)
+      }
+    } catch (e) {
+      console.error(e)
       __DEV__ && console.tron.log(e.message)
       return { kind: "bad-data" }
     }

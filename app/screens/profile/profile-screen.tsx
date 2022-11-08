@@ -17,6 +17,8 @@ import { NavigatorParamList } from "../../navigators"
 import { useStores } from "../../models"
 import { User, UserModel } from "../../models/user/user"
 import { Avatar } from "react-native-ui-lib"
+import ImageUpload from "../../components/upload-image"
+import UploadImage from "../../components/upload-image"
 
 const FULL: ViewStyle = { flex: 1 }
 
@@ -49,12 +51,6 @@ const BUTTONS_VIEW: ViewStyle = {}
 
 export const ProfileScreen: FC<StackScreenProps<NavigatorParamList, "profile">> = observer(
   ({ navigation }) => {
-    const [password, setPassword] = useState("")
-    const [email, setEmail] = useState("")
-    const [showError, setShowError] = useState(false)
-    const [user, setUser] = useState<User>(undefined)
-    const [showForm, setShowForm] = useState(false)
-
     const { userStore } = useStores()
 
     return (
@@ -70,7 +66,7 @@ export const ProfileScreen: FC<StackScreenProps<NavigatorParamList, "profile">> 
             titleStyle={HEADER_TITLE}
           />
           <View style={BUTTONS_VIEW}>
-            <Avatar animate source={{ uri: userStore?.user?.avatarSrc }} size={100} />
+            <UploadImage />
             <Text style={TAGLINE} text={userStore?.user?.username} />
             <Text style={TAGLINE} text={userStore?.user?.email} />
           </View>

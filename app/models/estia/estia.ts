@@ -1,4 +1,7 @@
 import { Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree"
+const Photos = types.model({
+  url: types.string,
+})
 
 export const EstiaModel = types.model("Estia").props({
   id: types.maybe(types.number),
@@ -7,7 +10,7 @@ export const EstiaModel = types.model("Estia").props({
   category: types.maybe(types.string),
   address: types.maybe(types.string),
   avatar: types.maybe(types.string),
-  // photos: types.maybe(types.array(types.string)),
+  photos: types.maybe(types.array(Photos)),
 })
 
 export interface Estia extends Instance<typeof EstiaModel> {}

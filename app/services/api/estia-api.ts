@@ -20,7 +20,7 @@ export class EstiaApi {
         if (problem) return problem
       }
 
-      const estias = response?.data?.data.map(estiaMapper)
+      const estias = response?.data?.data?.map(estiaMapper)
       return { kind: "ok", estias }
     } catch (e) {
       __DEV__ && console.tron.log(e.message)

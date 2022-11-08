@@ -1,4 +1,4 @@
-import { Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree"
+import { Instance, SnapshotIn, SnapshotOut, types, cast } from "mobx-state-tree"
 import { EstiaModel, EstiaSnapshotOut } from "../estia/estia"
 import { EstiaApi } from "../../services/api/estia-api"
 import { withEnvironment } from "../extensions/with-environment"
@@ -14,7 +14,7 @@ export const EstiaStoreModel = types
   .extend(withEnvironment)
   .actions((self) => ({
     saveEstias: (estiaSnapshots: EstiaSnapshotOut[]) => {
-      self.estias.replace(estiaSnapshots)
+      self.estias = cast(estiaSnapshots)
     },
   }))
   .actions((self) => ({
@@ -27,9 +27,11 @@ export const EstiaStoreModel = types
         __DEV__ && console.tron.log(result.kind)
       }
     },
+  }))
+  .actions((self) => ({
     getEstiaById: (id: number) => {
       return self.estias.find((estia) => {
-        return estia.id == id
+        return estia.id === id
       })
     },
   }))

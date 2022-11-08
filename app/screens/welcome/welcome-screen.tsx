@@ -16,6 +16,7 @@ import { color, spacing, typography } from "../../theme"
 import { NavigatorParamList } from "../../navigators"
 import { useStores } from "../../models"
 import { User, UserModel } from "../../models/user/user"
+import { RegisterForm } from "../../components/register-form"
 
 const estiaCLogo = require("../../../assets/images/logo.png")
 const bgImage = require("../../../assets/images/welcome-bg.jpg")
@@ -104,13 +105,15 @@ const FORM_TEXT_FIELD: ViewStyle = {
 }
 
 const FORM_ROW: ViewStyle = {
+  width: "80%",
+
   marginVertical: spacing[2],
   padding: spacing[1],
   backgroundColor: "white",
 }
 
 const BUTTONS_VIEW: ViewStyle = {
-  paddingVertical: spacing[5],
+  paddingVertical: spacing[3],
   alignContent: "center",
   justifyContent: "center",
   alignItems: "center",
@@ -125,6 +128,7 @@ export const WelcomeScreen: FC<StackScreenProps<NavigatorParamList, "welcome">> 
     const [password, setPassword] = useState("")
     const [email, setEmail] = useState("")
     const [showError, setShowError] = useState(false)
+    const [registrationForm, setRegistrationForm] = useState(false)
     const [user, setUser] = useState<User>(undefined)
     const [showForm, setShowForm] = useState(false)
 
@@ -134,6 +138,7 @@ export const WelcomeScreen: FC<StackScreenProps<NavigatorParamList, "welcome">> 
     const { authenticationStore, userStore } = useStores()
 
     const login = async () => {
+      setRegistrationForm(false)
       await authenticationStore.login(email, password)
       authenticationStore.status == undefined ? setShowError(true) : setShowError(false)
       authenticationStore.isAuthenticationed && nextScreen()
@@ -153,10 +158,11 @@ export const WelcomeScreen: FC<StackScreenProps<NavigatorParamList, "welcome">> 
     return (
       <View testID="WelcomeScreen" style={FULL}>
         <Screen style={CONTAINER} preset="auto" backgroundColor={color.transparent}>
-          <ImageBackground source={bgImage} resizeMode="center" style={BACKGROUND}>
-            <Header headerTx="welcomeScreen.poweredBy" style={HEADER} titleStyle={HEADER_TITLE} />
-            <Image source={estiaCLogo} style={BOWSER} />
-            <View style={{ flex: 1, justifyContent: "center" }}>
+          <GradientBackground colors={["#ffe259", "#ffa751"]} />
+          <Header headerTx="welcomeScreen.poweredBy" style={HEADER} titleStyle={HEADER_TITLE} />
+          <Image source={estiaCLogo} style={BOWSER} />
+          {!registrationForm ? (
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
               <FormRow preset="soloRound" style={FORM_ROW}>
                 <TextField
                   placeholder={"Email"}
@@ -177,7 +183,10 @@ export const WelcomeScreen: FC<StackScreenProps<NavigatorParamList, "welcome">> 
               </FormRow>
               {showError && <Text style={ALMOST} text="Wrong email or password. Try Again!" />}
             </View>
-          </ImageBackground>
+          ) : (
+            <RegisterForm />
+          )}
+
           <View style={BUTTONS_VIEW}>
             <Button
               testID="next-screen-button"
@@ -186,12 +195,15 @@ export const WelcomeScreen: FC<StackScreenProps<NavigatorParamList, "welcome">> 
               tx={`welcomeScreen.${authenticationStore?.isAuthenticationed ? "logout" : "login"}`}
               onPress={authenticationStore?.isAuthenticationed ? logout : login}
             />
-            <Button
-              testID="next-screen-button"
-              style={BUTTON}
-              textStyle={CONTINUE_TEXT}
-              text="SIGN UP"
-            />
+            {!registrationForm && (
+              <Button
+                testID="next-screen-button"
+                style={BUTTON}
+                textStyle={CONTINUE_TEXT}
+                text="SIGN UP"
+                onPress={() => setRegistrationForm(true)}
+              />
+            )}
           </View>
         </Screen>
       </View>

@@ -72,7 +72,7 @@ export const DemoMapScreen: FC<StackScreenProps<NavigatorParamList, "demoMap">> 
     }
 
     useEffect(() => {
-      ;(async () => {
+      const fetchLocation = async () => {
         let { status } = await Location.requestForegroundPermissionsAsync()
         if (status !== "granted") {
           setErrorMsg("Permission to access location was denied")
@@ -80,9 +80,17 @@ export const DemoMapScreen: FC<StackScreenProps<NavigatorParamList, "demoMap">> 
         }
         let location = await Location.getCurrentPositionAsync({})
         setLocation(location)
+      }
+      const fetchStoreEstias = async () => {
         await estiaStore.getEstias()
-        getEstias(estiaStore?.estias)
-      })()
+        try {
+          estias && getEstias(estiaStore?.estias)
+        } catch (error) {
+          console.log(error)
+        }
+      }
+      fetchLocation()
+      fetchStoreEstias()
     }, [estiaStore.estias])
     return (
       <View testID="DemoMapScreen" style={FULL}>

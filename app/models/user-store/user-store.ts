@@ -62,11 +62,19 @@ export const UserStoreModel = types
         __DEV__ && console.tron.log(result.kind)
       }
     },
+  }))
+  .actions((self) => ({
     logoutUser: (value: boolean) => {
       const [logout, setlogout] = useState(false)
 
       setlogout(value)
       logout && self.saveUser(undefined)
+    },
+    uploadUserAvatar: async (file: string) => {
+      console.log("store", file)
+      const uploadApi = new UserApi(self.environment.api)
+      await uploadApi.uploadUserAvatar(file, self.user.id)
+      await self.getUserById(self.user.id)
     },
   }))
 
