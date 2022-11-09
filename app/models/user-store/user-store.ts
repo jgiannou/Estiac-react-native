@@ -29,7 +29,6 @@ export const UserStoreModel = types
   }))
   .actions((self) => ({
     resetUser: () => {
-      console.log("reset")
       ;(self.user = {
         id: undefined,
         username: "",

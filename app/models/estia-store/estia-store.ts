@@ -10,11 +10,37 @@ export const EstiaStoreModel = types
   .model("EstiaStore")
   .props({
     estias: types.optional(types.array(EstiaModel), []),
+    estia: types.optional(EstiaModel, {}),
   })
   .extend(withEnvironment)
   .actions((self) => ({
     saveEstias: (estiaSnapshots: EstiaSnapshotOut[]) => {
       self.estias = cast(estiaSnapshots)
+    },
+    saveEstia: (estiaSnapshot: EstiaSnapshotOut) => {
+      // self.estia = {
+      //   id: estiaSnapshot?.id,
+      //   name: estiaSnapshot?.name,
+      //   description: estiaSnapshot?.description,
+      //   category: estiaSnapshot?.category,
+      //   address: estiaSnapshot?.address,
+      //   avatar: estiaSnapshot?.avatar,
+      //   photos: estiaSnapshot?.photos?.map((item) => item.url),
+      // }
+      self.estia = cast(estiaSnapshot)
+    },
+  }))
+  .actions((self) => ({
+    resetEstia: () => {
+      self.estia = {
+        id: undefined,
+        name: "",
+        description: "",
+        category: "",
+        address: "",
+        avatar: "",
+        photos: undefined,
+      }
     },
   }))
   .actions((self) => ({
@@ -29,10 +55,18 @@ export const EstiaStoreModel = types
     },
   }))
   .actions((self) => ({
-    getEstiaById: (id: number) => {
-      return self.estias.find((estia) => {
-        return estia.id === id
-      })
+    getEstiaById: async (id: number) => {
+      self.resetEstia()
+      const estiaApi = new EstiaApi(self.environment.api)
+      const result = await estiaApi.getEstiaById(id)
+      console.log(result)
+      if (result.kind === "ok") {
+        self.saveEstia(result.estia)
+      } else {
+        console.log("error: getEstia")
+        self.saveEstia(undefined)
+        __DEV__ && console.tron.log(result.kind)
+      }
     },
   }))
 
