@@ -27,7 +27,7 @@ const BOLD: TextStyle = { fontWeight: "bold" }
 const HEADER: TextStyle = {
   paddingTop: spacing[3],
   paddingBottom: spacing[5] - 1,
-  paddingHorizontal: 0,
+  paddingHorizontal: spacing[4],
 }
 const HEADER_TITLE: TextStyle = {
   ...BOLD,
@@ -58,22 +58,6 @@ export const EstiaScreen: FC<StackScreenProps<NavigatorParamList, "estia">> = ob
       <Image style={styles.imageItem} source={{ uri: info.item }} />
     )
 
-    const renderOptionItemIcon = (style: ImageStyle, icon: string): React.ReactElement => (
-      <Icon {...style} name={icon} />
-    )
-
-    const renderOptionItem = (option: any, index: number): React.ReactElement => (
-      <Button
-        key={index}
-        style={styles.optionItem}
-        appearance="ghost"
-        size="small"
-        // accessoryLeft={(style: ImageStyle) => renderOptionItemIcon(style, option.icon)}
-      >
-        {option.title}
-      </Button>
-    )
-
     const renderDetailItem = (detail: string, index: number): React.ReactElement => (
       <Button key={index} style={styles.detailItem} appearance="outline" size="tiny">
         {detail}
@@ -97,7 +81,6 @@ export const EstiaScreen: FC<StackScreenProps<NavigatorParamList, "estia">> = ob
     console.log(estia)
     return (
       <View testID="EstiaScreen" style={FULL}>
-        {/* <GradientBackground colors={["#422443", "#281b34"]} />
         <Screen style={CONTAINER} preset="scroll" backgroundColor={color.palette.white}>
           <Header
             headerText={estia?.name}
@@ -107,84 +90,45 @@ export const EstiaScreen: FC<StackScreenProps<NavigatorParamList, "estia">> = ob
             style={HEADER}
             titleStyle={HEADER_TITLE}
           />
-
-          <Carousel loop autoplay={true} containerStyle={{ height: 500 }} allowAccessibleLayout>
-            {estia?.photos.map((item, index) => {
-              return <AutoImage source={{ uri: item?.url }} key={index} style={IMAGE} />
-            })}
-          </Carousel>
-
-          <Animated.ScrollView
-            showsVerticalScrollIndicator={false}
-            showsHorizontalScrollIndicator={false}
-            scrollEventThrottle={16}
-          >
-            <Fader visible={true} position={FaderPosition.BOTTOM} tintColor={undefined} />
-
-            <Text
-              text={estia?.description}
-              style={{ color: "black", marginVertical: spacing[2] }}
-            />
-            <Text
-              text={estia?.description}
-              style={{ color: "black", marginVertical: spacing[2] }}
-            />
-            <Text
-              text={estia?.description}
-              style={{ color: "black", marginVertical: spacing[2] }}
-            />
-            <Text
-              text={estia?.description}
-              style={{ color: "black", marginVertical: spacing[2] }}
-            />
-            <Text
-              text={estia?.description}
-              style={{ color: "black", marginVertical: spacing[2] }}
-            />
-            <Text
-              text={estia?.description}
-              style={{ color: "black", marginVertical: spacing[2] }}
-            />
-          </Animated.ScrollView>
-        </Screen> */}
-        <ScrollView style={styles.container}>
-          <ImageOverlay style={styles.image} source={{ uri: estia?.avatar }} />
-          <Card
-            style={styles.bookingCard}
-            appearance="filled"
-            disabled={true}
-            footer={renderBookingFooter}
-          >
-            <Text style={styles.title} category="h6">
-              {estia?.name}
+          <ScrollView style={styles.container}>
+            <ImageOverlay style={styles.image} source={{ uri: estia?.avatar }} />
+            <Card
+              style={styles.bookingCard}
+              appearance="filled"
+              disabled={true}
+              footer={renderBookingFooter}
+            >
+              <Text style={styles.title} category="h6">
+                {estia?.name}
+              </Text>
+              <Text style={styles.rentLabel} appearance="hint" category="p2">
+                Monthly Subscription
+              </Text>
+              <Text style={styles.priceLabel} category="h6">
+                15€
+              </Text>
+              <Button style={styles.bookButton} onPress={onBookButtonPress}>
+                SUBSCRIBE
+              </Button>
+            </Card>
+            <Text style={styles.sectionLabel} category="s1">
+              About
             </Text>
-            <Text style={styles.rentLabel} appearance="hint" category="p2">
-              Monthly Subscription
+            <Text style={styles.description} appearance="hint">
+              {estia?.description}
             </Text>
-            <Text style={styles.priceLabel} category="h6">
-              15€
+            <Text style={styles.sectionLabel} category="s1">
+              Photos
             </Text>
-            <Button style={styles.bookButton} onPress={onBookButtonPress}>
-              SUBSCRIBE
-            </Button>
-          </Card>
-          <Text style={styles.sectionLabel} category="s1">
-            About
-          </Text>
-          <Text style={styles.description} appearance="hint">
-            {estia?.description}
-          </Text>
-          <Text style={styles.sectionLabel} category="s1">
-            Photos
-          </Text>
-          <List
-            contentContainerStyle={styles.imagesList}
-            horizontal={true}
-            showsHorizontalScrollIndicator={false}
-            data={estia?.photos?.map((item) => item.url)}
-            renderItem={renderImageItem}
-          />
-        </ScrollView>
+            <List
+              contentContainerStyle={styles.imagesList}
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+              data={estia?.photos?.map((item) => item.url)}
+              renderItem={renderImageItem}
+            />
+          </ScrollView>
+        </Screen>
       </View>
     )
   },
