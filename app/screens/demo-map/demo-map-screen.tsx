@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from "react"
+import React, { FC, useEffect, useRef, useState } from "react"
 import { ActivityIndicator, Dimensions, TextStyle, View, ViewStyle } from "react-native"
 import { StackScreenProps } from "@react-navigation/stack"
 import { observer } from "mobx-react-lite"
@@ -9,17 +9,17 @@ import * as Location from "expo-location"
 import MapView, { Callout, Marker, PROVIDER_GOOGLE } from "react-native-maps"
 import { useStores } from "../../models"
 import { StyledMapMarker } from "../../components/styled-map-marker/styled-map-marker"
+import { LocationObject } from "expo-location"
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 
 const FULL: ViewStyle = { flex: 1 }
 const CONTAINER: ViewStyle = {
   backgroundColor: "none",
-  paddingHorizontal: spacing[4],
 }
 const BOLD: TextStyle = { fontWeight: "bold" }
 const HEADER: TextStyle = {
   paddingTop: spacing[3],
-  paddingBottom: spacing[5] - 1,
-  paddingHorizontal: 0,
+  paddingHorizontal: spacing[4],
 }
 const HEADER_TITLE: TextStyle = {
   ...BOLD,
@@ -30,12 +30,12 @@ const HEADER_TITLE: TextStyle = {
 }
 const MAP_WRAPPER: ViewStyle = {
   flex: 1,
-  backgroundColor: "#fff",
+  backgroundColor: "green",
   alignItems: "center",
   justifyContent: "center",
+  margin: 0,
 }
 const MAP: TextStyle = {
-  marginTop: 50,
   width: Dimensions.get("window").width,
   height: Dimensions.get("window").height,
 }
@@ -65,6 +65,18 @@ export const DemoMapScreen: FC<StackScreenProps<NavigatorParamList, "demoMap">> 
       })
       Promise.all(newEstias).then(setEstias)
     }
+    const gotToInitialRegion = () => {
+      console.log("mpike ref", location)
+      return mapRef?.current?.animateToRegion(
+        {
+          latitude: location?.coords?.latitude,
+          longitude: location?.coords?.longitude,
+          latitudeDelta: 0.04,
+          longitudeDelta: 0.04,
+        },
+        3000,
+      )
+    }
 
     useEffect(() => {
       const fetchLocation = async () => {
@@ -73,12 +85,10 @@ export const DemoMapScreen: FC<StackScreenProps<NavigatorParamList, "demoMap">> 
           setErrorMsg("Permission to access location was denied")
           return
         }
-        let location = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.Balanced,
+        let currentLocation = await Location.getCurrentPositionAsync({})
 
-          timeInterval: 5,
-        })
-        setLocation(location)
+        setLocation(currentLocation)
+        location && gotToInitialRegion()
       }
       const fetchStoreEstias = async () => {
         await estiaStore.getEstias()
@@ -90,9 +100,22 @@ export const DemoMapScreen: FC<StackScreenProps<NavigatorParamList, "demoMap">> 
       }
       fetchLocation()
       fetchStoreEstias()
-    }, [])
+    }, [estiaStore])
+    const insets = useSafeAreaInsets()
+
+    const mapRef = useRef(null)
+    console.log(location)
     return (
-      <View testID="DemoMapScreen" style={FULL}>
+      <SafeAreaView
+        testID="DemoMapScreen"
+        style={{
+          flex: 1,
+          justifyContent: "flex-start",
+          alignItems: "flex-start",
+          padding: 0,
+        }}
+        edges={["left", "right"]}
+      >
         <Screen style={CONTAINER} preset="scroll">
           <Header
             headerTx="demoScreen.howTo"
@@ -102,267 +125,259 @@ export const DemoMapScreen: FC<StackScreenProps<NavigatorParamList, "demoMap">> 
             style={HEADER}
             titleStyle={HEADER_TITLE}
           />
-          <View style={MAP_WRAPPER}>
-            {!location ? (
-              <Screen style={LOADER_CONTAINER}>
-                <ActivityIndicator size="large" />
-                <Text preset="default" style={{ color: "black" }} text="Loading" />
-              </Screen>
-            ) : (
-              <MapView
-                style={MAP}
-                provider={PROVIDER_GOOGLE}
-                customMapStyle={[
-                  {
-                    elementType: "geometry",
-                    stylers: [
-                      {
-                        color: "#ebe3cd",
-                      },
-                    ],
-                  },
-                  {
-                    elementType: "labels.text.fill",
-                    stylers: [
-                      {
-                        color: "#523735",
-                      },
-                    ],
-                  },
-                  {
-                    elementType: "labels.text.stroke",
-                    stylers: [
-                      {
-                        color: "#f5f1e6",
-                      },
-                    ],
-                  },
-                  {
-                    featureType: "administrative",
-                    elementType: "geometry.stroke",
-                    stylers: [
-                      {
-                        color: "#c9b2a6",
-                      },
-                    ],
-                  },
-                  {
-                    featureType: "administrative.land_parcel",
-                    elementType: "geometry.stroke",
-                    stylers: [
-                      {
-                        color: "#dcd2be",
-                      },
-                    ],
-                  },
-                  {
-                    featureType: "administrative.land_parcel",
-                    elementType: "labels.text.fill",
-                    stylers: [
-                      {
-                        color: "#ae9e90",
-                      },
-                    ],
-                  },
-                  {
-                    featureType: "landscape.natural",
-                    elementType: "geometry",
-                    stylers: [
-                      {
-                        color: "#dfd2ae",
-                      },
-                    ],
-                  },
-                  {
-                    featureType: "poi",
-                    elementType: "geometry",
-                    stylers: [
-                      {
-                        color: "#dfd2ae",
-                      },
-                    ],
-                  },
-                  {
-                    featureType: "poi",
-                    elementType: "labels.text.fill",
-                    stylers: [
-                      {
-                        color: "#93817c",
-                      },
-                    ],
-                  },
-                  {
-                    featureType: "poi.park",
-                    elementType: "geometry.fill",
-                    stylers: [
-                      {
-                        color: "#a5b076",
-                      },
-                    ],
-                  },
-                  {
-                    featureType: "poi.park",
-                    elementType: "labels.text.fill",
-                    stylers: [
-                      {
-                        color: "#447530",
-                      },
-                    ],
-                  },
-                  {
-                    featureType: "road",
-                    elementType: "geometry",
-                    stylers: [
-                      {
-                        color: "#f5f1e6",
-                      },
-                    ],
-                  },
-                  {
-                    featureType: "road.arterial",
-                    elementType: "geometry",
-                    stylers: [
-                      {
-                        color: "#fdfcf8",
-                      },
-                    ],
-                  },
-                  {
-                    featureType: "road.highway",
-                    elementType: "geometry",
-                    stylers: [
-                      {
-                        color: "#f8c967",
-                      },
-                    ],
-                  },
-                  {
-                    featureType: "road.highway",
-                    elementType: "geometry.stroke",
-                    stylers: [
-                      {
-                        color: "#e9bc62",
-                      },
-                    ],
-                  },
-                  {
-                    featureType: "road.highway.controlled_access",
-                    elementType: "geometry",
-                    stylers: [
-                      {
-                        color: "#e98d58",
-                      },
-                    ],
-                  },
-                  {
-                    featureType: "road.highway.controlled_access",
-                    elementType: "geometry.stroke",
-                    stylers: [
-                      {
-                        color: "#db8555",
-                      },
-                    ],
-                  },
-                  {
-                    featureType: "road.local",
-                    elementType: "labels.text.fill",
-                    stylers: [
-                      {
-                        color: "#806b63",
-                      },
-                    ],
-                  },
-                  {
-                    featureType: "transit.line",
-                    elementType: "geometry",
-                    stylers: [
-                      {
-                        color: "#dfd2ae",
-                      },
-                    ],
-                  },
-                  {
-                    featureType: "transit.line",
-                    elementType: "labels.text.fill",
-                    stylers: [
-                      {
-                        color: "#8f7d77",
-                      },
-                    ],
-                  },
-                  {
-                    featureType: "transit.line",
-                    elementType: "labels.text.stroke",
-                    stylers: [
-                      {
-                        color: "#ebe3cd",
-                      },
-                    ],
-                  },
-                  {
-                    featureType: "transit.station",
-                    elementType: "geometry",
-                    stylers: [
-                      {
-                        color: "#dfd2ae",
-                      },
-                    ],
-                  },
-                  {
-                    featureType: "water",
-                    elementType: "geometry.fill",
-                    stylers: [
-                      {
-                        color: "#b9d3c2",
-                      },
-                    ],
-                  },
-                  {
-                    featureType: "water",
-                    elementType: "labels.text.fill",
-                    stylers: [
-                      {
-                        color: "#92998d",
-                      },
-                    ],
-                  },
-                ]}
-                initialRegion={{
-                  latitude: location?.coords?.latitude,
-                  longitude: location?.coords?.longitude,
-                  latitudeDelta: 0.0421,
-                  longitudeDelta: 0.0421,
-                }}
-                showsCompass={true}
-                showsUserLocation={true}
-                userLocationAnnotationTitle={"asdasd"}
-                showsMyLocationButton={true}
-                followsUserLocation={true}
-                cacheEnabled
-                loadingEnabled
-              >
-                <>
-                  {estias.length > 0 &&
-                    estias?.map((estia, index) => {
-                      return (
-                        <Marker
-                          key={index}
-                          coordinate={{
-                            latitude: estia?.latitude,
-                            longitude: estia?.longitude,
-                          }}
-                          onPress={() => navigation.navigate("estia", { estiaId: estia?.id })}
-                        >
-                          <StyledMapMarker text={estia?.name} image={estia?.avatar} />
-                        </Marker>
-                      )
-                    })}
-                </>
-              </MapView>
-            )}
-          </View>
+          <MapView
+            ref={mapRef}
+            style={MAP}
+            provider={PROVIDER_GOOGLE}
+            // customMapStyle={[
+            //   {
+            //     elementType: "geometry",
+            //     stylers: [
+            //       {
+            //         color: "#ebe3cd",
+            //       },
+            //     ],
+            //   },
+            //   {
+            //     elementType: "labels.text.fill",
+            //     stylers: [
+            //       {
+            //         color: "#523735",
+            //       },
+            //     ],
+            //   },
+            //   {
+            //     elementType: "labels.text.stroke",
+            //     stylers: [
+            //       {
+            //         color: "#f5f1e6",
+            //       },
+            //     ],
+            //   },
+            //   {
+            //     featureType: "administrative",
+            //     elementType: "geometry.stroke",
+            //     stylers: [
+            //       {
+            //         color: "#c9b2a6",
+            //       },
+            //     ],
+            //   },
+            //   {
+            //     featureType: "administrative.land_parcel",
+            //     elementType: "geometry.stroke",
+            //     stylers: [
+            //       {
+            //         color: "#dcd2be",
+            //       },
+            //     ],
+            //   },
+            //   {
+            //     featureType: "administrative.land_parcel",
+            //     elementType: "labels.text.fill",
+            //     stylers: [
+            //       {
+            //         color: "#ae9e90",
+            //       },
+            //     ],
+            //   },
+            //   {
+            //     featureType: "landscape.natural",
+            //     elementType: "geometry",
+            //     stylers: [
+            //       {
+            //         color: "#dfd2ae",
+            //       },
+            //     ],
+            //   },
+            //   {
+            //     featureType: "poi",
+            //     elementType: "geometry",
+            //     stylers: [
+            //       {
+            //         color: "#dfd2ae",
+            //       },
+            //     ],
+            //   },
+            //   {
+            //     featureType: "poi",
+            //     elementType: "labels.text.fill",
+            //     stylers: [
+            //       {
+            //         color: "#93817c",
+            //       },
+            //     ],
+            //   },
+            //   {
+            //     featureType: "poi.park",
+            //     elementType: "geometry.fill",
+            //     stylers: [
+            //       {
+            //         color: "#a5b076",
+            //       },
+            //     ],
+            //   },
+            //   {
+            //     featureType: "poi.park",
+            //     elementType: "labels.text.fill",
+            //     stylers: [
+            //       {
+            //         color: "#447530",
+            //       },
+            //     ],
+            //   },
+            //   {
+            //     featureType: "road",
+            //     elementType: "geometry",
+            //     stylers: [
+            //       {
+            //         color: "#f5f1e6",
+            //       },
+            //     ],
+            //   },
+            //   {
+            //     featureType: "road.arterial",
+            //     elementType: "geometry",
+            //     stylers: [
+            //       {
+            //         color: "#fdfcf8",
+            //       },
+            //     ],
+            //   },
+            //   {
+            //     featureType: "road.highway",
+            //     elementType: "geometry",
+            //     stylers: [
+            //       {
+            //         color: "#f8c967",
+            //       },
+            //     ],
+            //   },
+            //   {
+            //     featureType: "road.highway",
+            //     elementType: "geometry.stroke",
+            //     stylers: [
+            //       {
+            //         color: "#e9bc62",
+            //       },
+            //     ],
+            //   },
+            //   {
+            //     featureType: "road.highway.controlled_access",
+            //     elementType: "geometry",
+            //     stylers: [
+            //       {
+            //         color: "#e98d58",
+            //       },
+            //     ],
+            //   },
+            //   {
+            //     featureType: "road.highway.controlled_access",
+            //     elementType: "geometry.stroke",
+            //     stylers: [
+            //       {
+            //         color: "#db8555",
+            //       },
+            //     ],
+            //   },
+            //   {
+            //     featureType: "road.local",
+            //     elementType: "labels.text.fill",
+            //     stylers: [
+            //       {
+            //         color: "#806b63",
+            //       },
+            //     ],
+            //   },
+            //   {
+            //     featureType: "transit.line",
+            //     elementType: "geometry",
+            //     stylers: [
+            //       {
+            //         color: "#dfd2ae",
+            //       },
+            //     ],
+            //   },
+            //   {
+            //     featureType: "transit.line",
+            //     elementType: "labels.text.fill",
+            //     stylers: [
+            //       {
+            //         color: "#8f7d77",
+            //       },
+            //     ],
+            //   },
+            //   {
+            //     featureType: "transit.line",
+            //     elementType: "labels.text.stroke",
+            //     stylers: [
+            //       {
+            //         color: "#ebe3cd",
+            //       },
+            //     ],
+            //   },
+            //   {
+            //     featureType: "transit.station",
+            //     elementType: "geometry",
+            //     stylers: [
+            //       {
+            //         color: "#dfd2ae",
+            //       },
+            //     ],
+            //   },
+            //   {
+            //     featureType: "water",
+            //     elementType: "geometry.fill",
+            //     stylers: [
+            //       {
+            //         color: "#b9d3c2",
+            //       },
+            //     ],
+            //   },
+            //   {
+            //     featureType: "water",
+            //     elementType: "labels.text.fill",
+            //     stylers: [
+            //       {
+            //         color: "#92998d",
+            //       },
+            //     ],
+            //   },
+            // ]}
+            initialRegion={{
+              latitude: 37.98381,
+              longitude: 23.727539,
+              latitudeDelta: 0.4,
+              longitudeDelta: 0.4,
+            }}
+            showsCompass={true}
+            showsUserLocation={true}
+            userLocationAnnotationTitle={"asdasd"}
+            showsMyLocationButton={true}
+            followsUserLocation={true}
+            zoomEnabled={true}
+            loadingEnabled={true}
+          >
+            <>
+              {estias.length > 0 &&
+                estias?.map((estia, index) => {
+                  return (
+                    <Marker
+                      key={index}
+                      coordinate={{
+                        latitude: estia?.latitude,
+                        longitude: estia?.longitude,
+                      }}
+                      onPress={() => navigation.navigate("estia", { estiaId: estia?.id })}
+                    >
+                      <StyledMapMarker text={estia?.name} image={estia?.avatar} />
+                    </Marker>
+                  )
+                })}
+            </>
+          </MapView>
         </Screen>
-      </View>
+      </SafeAreaView>
     )
   },
 )
