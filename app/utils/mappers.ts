@@ -10,6 +10,8 @@ export const estiaMapper = (data: IDModel) => ({
   avatar:
     DEFAULT_API_CONFIG.url + data?.attributes?.avatar?.data?.attributes?.formats?.thumbnail?.url,
   photos: data?.attributes?.photos?.data?.map(photosArrayMapper),
+  price: data?.attributes?.price,
+  cover: DEFAULT_API_CONFIG.url + data?.attributes?.cover?.data?.attributes?.url,
 })
 
 export const photosArrayMapper = (data: IDModel) => ({

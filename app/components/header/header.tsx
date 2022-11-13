@@ -7,7 +7,6 @@ import { Icon } from "../icon/icon"
 import { color, spacing } from "../../theme"
 import { translate } from "../../i18n/"
 import { useStores } from "../../models"
-import { AutoImage } from "../auto-image/auto-image"
 import { Avatar } from "react-native-ui-lib"
 
 // static styles

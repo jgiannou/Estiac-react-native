@@ -4,7 +4,8 @@
   "info": {
     "singularName": "estia",
     "pluralName": "estias",
-    "displayName": "Estia"
+    "displayName": "Estia",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -27,6 +28,34 @@
       "type": "string"
     },
     "avatar": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "photos": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "description": {
+      "type": "string"
+    },
+    "price": {
+      "type": "decimal"
+    },
+    "cover": {
       "allowedTypes": [
         "images",
         "files",
@@ -35,19 +64,6 @@
       ],
       "type": "media",
       "multiple": false
-    },
-    "photos": {
-      "allowedTypes": [
-        "images",
-        "files",
-        "videos",
-        "audios"
-      ],
-      "type": "media",
-      "multiple": true
-    },
-    "description": {
-      "type": "string"
     }
   }
 }

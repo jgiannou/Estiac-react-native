@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from "react"
-import { View, ViewStyle, TextStyle, ImageStyle, SafeAreaView, ImageBackground } from "react-native"
+import { View, ViewStyle, TextStyle, ImageStyle } from "react-native"
 import { StackScreenProps } from "@react-navigation/stack"
 import { observer } from "mobx-react-lite"
 import {
@@ -17,14 +17,15 @@ import { NavigatorParamList } from "../../navigators"
 import { useStores } from "../../models"
 import { User, UserModel } from "../../models/user/user"
 import { RegisterForm } from "../../components/register-form"
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 
 const estiaCLogo = require("../../../assets/images/logo.png")
 const bgImage = require("../../../assets/images/welcome-bg.jpg")
 
 const FULL: ViewStyle = { flex: 1 }
-const CONTAINER: ViewStyle = { flex: 1, backgroundColor: "white" }
+const CONTAINER: ViewStyle = { flex: 1, backgroundColor: "white", padding: 0 }
 const BACKGROUND: ViewStyle = {
-  flex: 0.8,
+  flex: 0.5,
   paddingHorizontal: spacing[4],
   paddingBottom: spacing[4],
   backgroundColor: "white",
@@ -35,7 +36,7 @@ const TEXT: TextStyle = {
 }
 const BOLD: TextStyle = { fontWeight: "bold" }
 const HEADER: TextStyle = {
-  paddingTop: spacing[3],
+  marginTop: spacing[5],
   paddingHorizontal: 0,
 }
 const HEADER_TITLE: TextStyle = {
@@ -113,14 +114,13 @@ const FORM_ROW: ViewStyle = {
 }
 
 const BUTTONS_VIEW: ViewStyle = {
-  paddingVertical: spacing[3],
-  alignContent: "center",
-  justifyContent: "center",
+  margin: 0,
+  paddingTop: spacing[5],
   alignItems: "center",
   backgroundColor: "white",
   borderTopStartRadius: 50,
   borderTopEndRadius: 50,
-  marginTop: -50,
+  flex: 1,
 }
 
 export const WelcomeScreen: FC<StackScreenProps<NavigatorParamList, "welcome">> = observer(
@@ -154,15 +154,26 @@ export const WelcomeScreen: FC<StackScreenProps<NavigatorParamList, "welcome">> 
         authenticationStore.resetStatus()
       }
     }, [authenticationStore.jwt])
+    const insets = useSafeAreaInsets()
 
     return (
-      <View testID="WelcomeScreen" style={FULL}>
-        <Screen style={CONTAINER} preset="auto" backgroundColor={color.transparent}>
+      <SafeAreaView
+        testID="WelcomeScreen"
+        style={{
+          flex: 1,
+          padding: 0,
+          marginTop: -insets.top,
+          marginBottom: 0,
+          backgroundColor: "white",
+        }}
+        edges={["left", "right"]}
+      >
+        <Screen style={CONTAINER} preset="auto" backgroundColor={color.primary}>
           <GradientBackground colors={["#ffe259", "#ffa751"]} />
           <Header headerTx="welcomeScreen.poweredBy" style={HEADER} titleStyle={HEADER_TITLE} />
           <Image source={estiaCLogo} style={BOWSER} />
           {!registrationForm ? (
-            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 0 }}>
               <FormRow preset="soloRound" style={FORM_ROW}>
                 <TextField
                   placeholder={"Email"}
@@ -206,7 +217,7 @@ export const WelcomeScreen: FC<StackScreenProps<NavigatorParamList, "welcome">> 
             )}
           </View>
         </Screen>
-      </View>
+      </SafeAreaView>
     )
   },
 )

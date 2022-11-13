@@ -11,6 +11,8 @@ export const EstiaModel = types.model("Estia").props({
   address: types.maybe(types.string),
   avatar: types.maybe(types.string),
   photos: types.maybe(types.array(Photos)),
+  price: types.maybe(types.number),
+  cover: types.maybe(types.string),
 })
 
 export interface Estia extends Instance<typeof EstiaModel> {}

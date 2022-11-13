@@ -1,27 +1,19 @@
 import React, { FC, useEffect, useState } from "react"
-import {
-  Animated,
-  ImageSourcePropType,
-  ImageStyle,
-  ListRenderItemInfo,
-  ScrollView,
-  TextStyle,
-  View,
-  ViewStyle,
-  Image,
-} from "react-native"
+import { ScrollView, TextStyle, View, ViewStyle, Image } from "react-native"
 import { StackScreenProps } from "@react-navigation/stack"
 import { observer } from "mobx-react-lite"
-import { Header, Screen, GradientBackground, AutoImage } from "../../components"
+import { Header, Screen } from "../../components"
 import { NavigatorParamList } from "../../navigators"
-import { color, spacing } from "../../theme"
+import { spacing } from "../../theme"
 import { useStores } from "../../models"
-import { Button, Card, Icon, List, StyleService, Text, useStyleSheet } from "@ui-kitten/components"
+import { Button, Card, List, StyleService, Text, useStyleSheet } from "@ui-kitten/components"
 import { ImageOverlay } from "./image-overlay"
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 
-const FULL: ViewStyle = { flex: 1 }
+const FULL: ViewStyle = { flex: 1, backgroundColor: "transparent" }
 const CONTAINER: ViewStyle = {
-  backgroundColor: color.palette.white,
+  padding: 0,
+  margin: 0,
 }
 const BOLD: TextStyle = { fontWeight: "bold" }
 const HEADER: TextStyle = {
@@ -55,7 +47,7 @@ export const EstiaScreen: FC<StackScreenProps<NavigatorParamList, "estia">> = ob
       ],
     }
     const renderImageItem = (info: any): React.ReactElement => (
-      <Image style={styles.imageItem} source={{ uri: info.item }} />
+      <Image style={styles.imageItem} source={{ uri: info?.item }} />
     )
 
     const renderDetailItem = (detail: string, index: number): React.ReactElement => (
@@ -78,24 +70,52 @@ export const EstiaScreen: FC<StackScreenProps<NavigatorParamList, "estia">> = ob
       fetchEstia()
       setEstia(estiaStore.estia)
     }, [estiaId])
-    console.log(estia)
+
+    const insets = useSafeAreaInsets()
     return (
-      <View testID="EstiaScreen" style={FULL}>
-        <Screen style={CONTAINER} preset="scroll" backgroundColor={color.palette.white}>
-          <Header
+      <SafeAreaView
+        testID="EstiaScreen"
+        style={{
+          flex: 1,
+          justifyContent: "flex-start",
+          alignItems: "flex-start",
+          padding: 0,
+          marginTop: -insets.top,
+        }}
+        edges={["left", "right"]}
+      >
+        <Screen style={CONTAINER} preset="scroll">
+          {/* <Header
             headerText={estia?.name}
             leftIcon="back"
             onLeftPress={goBack}
             rightIcon={"profile"}
             style={HEADER}
             titleStyle={HEADER_TITLE}
-          />
+          /> */}
           <ScrollView style={styles.container}>
-            <ImageOverlay style={styles.image} source={{ uri: estia?.avatar }} />
+            {estia?.cover ? (
+              <ImageOverlay style={styles.image} source={{ uri: estia?.cover }} />
+            ) : (
+              <View
+                style={{
+                  flex: 1,
+                  height: 360,
+                  width: "100%",
+                  backgroundColor: "gray",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text style={{ textAlign: "center" }} category="h4">
+                  {estia?.name}
+                </Text>
+              </View>
+            )}
             <Card
               style={styles.bookingCard}
               appearance="filled"
-              disabled={true}
+              disabled={false}
               footer={renderBookingFooter}
             >
               <Text style={styles.title} category="h6">
@@ -105,7 +125,7 @@ export const EstiaScreen: FC<StackScreenProps<NavigatorParamList, "estia">> = ob
                 Monthly Subscription
               </Text>
               <Text style={styles.priceLabel} category="h6">
-                15€
+                {estia?.price}€
               </Text>
               <Button style={styles.bookButton} onPress={onBookButtonPress}>
                 SUBSCRIBE
@@ -117,32 +137,44 @@ export const EstiaScreen: FC<StackScreenProps<NavigatorParamList, "estia">> = ob
             <Text style={styles.description} appearance="hint">
               {estia?.description}
             </Text>
-            <Text style={styles.sectionLabel} category="s1">
-              Photos
-            </Text>
-            <List
-              contentContainerStyle={styles.imagesList}
-              horizontal={true}
-              showsHorizontalScrollIndicator={false}
-              data={estia?.photos?.map((item) => item.url)}
-              renderItem={renderImageItem}
-            />
+            {estia?.photos && (
+              <>
+                <Text style={styles.sectionLabel} category="s1">
+                  Photos
+                </Text>
+                <List
+                  contentContainerStyle={styles.imagesList}
+                  horizontal={true}
+                  showsHorizontalScrollIndicator={false}
+                  data={estia?.photos?.map((item) => item?.url)}
+                  renderItem={renderImageItem}
+                />
+              </>
+            )}
           </ScrollView>
         </Screen>
-      </View>
+      </SafeAreaView>
     )
   },
 )
 const themedStyles = StyleService.create({
   container: {
-    backgroundColor: "background-basic-color-2",
+    padding: 0,
+    margin: 0,
   },
   image: {
+    padding: 0,
     height: 360,
   },
   bookingCard: {
     marginTop: -80,
     margin: 16,
+    shadowColor: "black",
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 10, height: 20 },
+    shadowRadius: 10,
+    elevation: 3,
+    backgroundColor: "background-basic-color-2",
   },
   title: {
     width: "65%",

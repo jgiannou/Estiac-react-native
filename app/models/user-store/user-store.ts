@@ -50,7 +50,6 @@ export const UserStoreModel = types
       self.resetUser()
       const userApi = new UserApi(self.environment.api)
       const result = await userApi.getUserById(id)
-      console.log("getUserBy", result)
       if (result.kind === "ok") {
         self.saveUser(result.user)
         self.getAuth(true)
@@ -70,7 +69,6 @@ export const UserStoreModel = types
       logout && self.saveUser(undefined)
     },
     uploadUserAvatar: async (file: string) => {
-      console.log("store", file)
       const uploadApi = new UserApi(self.environment.api)
       await uploadApi.uploadUserAvatar(file, self.user.id)
       await self.getUserById(self.user.id)

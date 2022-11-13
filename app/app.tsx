@@ -12,7 +12,11 @@
 import "./i18n"
 import "./utils/ignore-warnings"
 import React, { useState, useEffect } from "react"
-import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context"
+import {
+  SafeAreaProvider,
+  initialWindowMetrics,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context"
 import { initFonts } from "./theme/fonts" // expo
 import * as storage from "./utils/storage"
 import { AppNavigator, useNavigationPersistence } from "./navigators"
@@ -20,7 +24,8 @@ import { RootStore, RootStoreProvider, setupRootStore } from "./models"
 import { ToggleStorybook } from "../storybook/toggle-storybook"
 import { ErrorBoundary } from "./screens/error/error-boundary"
 import * as eva from "@eva-design/eva"
-import { ApplicationProvider } from "@ui-kitten/components"
+import { ApplicationProvider, IconRegistry } from "@ui-kitten/components"
+import { EvaIconsPack } from "@ui-kitten/eva-icons"
 // This puts screens in a native ViewController or Activity. If you want fully native
 // stack navigation, use `createNativeStackNavigator` in place of `createStackNavigator`:
 // https://github.com/kmagiera/react-native-screens#using-native-stack-navigator
@@ -53,23 +58,28 @@ function App() {
   // In Android: https://stackoverflow.com/a/45838109/204044
   // You can replace with your own loading component if you wish.
   if (!rootStore || !isNavigationStateRestored) return null
-
   // otherwise, we're ready to render the app
   return (
-    <ApplicationProvider {...eva} theme={eva.light}>
-      <ToggleStorybook>
-        <RootStoreProvider value={rootStore}>
-          <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-            <ErrorBoundary catchErrors={"always"}>
-              <AppNavigator
-                initialState={initialNavigationState}
-                onStateChange={onNavigationStateChange}
-              />
-            </ErrorBoundary>
-          </SafeAreaProvider>
-        </RootStoreProvider>
-      </ToggleStorybook>
-    </ApplicationProvider>
+    <>
+      <IconRegistry icons={EvaIconsPack} />
+      <ApplicationProvider {...eva} theme={eva.light}>
+        <ToggleStorybook>
+          <RootStoreProvider value={rootStore}>
+            <SafeAreaProvider
+              initialMetrics={initialWindowMetrics}
+              style={{ margin: 0, padding: 0 }}
+            >
+              <ErrorBoundary catchErrors={"always"}>
+                <AppNavigator
+                  initialState={initialNavigationState}
+                  onStateChange={onNavigationStateChange}
+                />
+              </ErrorBoundary>
+            </SafeAreaProvider>
+          </RootStoreProvider>
+        </ToggleStorybook>
+      </ApplicationProvider>
+    </>
   )
 }
 

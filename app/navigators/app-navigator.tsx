@@ -17,11 +17,22 @@ import { observer } from "mobx-react-lite"
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
-  DrawerItem,
   DrawerItemList,
 } from "@react-navigation/drawer"
 import { ProfileScreen } from "../screens/profile/profile-screen"
-
+import {
+  Drawer,
+  DrawerItem,
+  Layout,
+  Text,
+  IndexPath,
+  BottomNavigation,
+  BottomNavigationTab,
+  Avatar,
+  Icon,
+} from "@ui-kitten/components"
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
+import { DrawerHeader } from "../components/drawer-header/drawerHeader"
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
  * as well as what properties (if any) they might take when navigating to them.
@@ -39,90 +50,103 @@ export type NavigatorParamList = {
   estia: { estiaId: number }
   rightDrawer: undefined
   leftDrawer: undefined
+  logout: undefined
   // 🔥 Your screens go here
 }
 
 // Documentation: https://reactnavigation.org/docs/stack-navigator/
-const LeftDrawer = createDrawerNavigator<NavigatorParamList>()
+const appStack = createNativeStackNavigator()
 const RightDrawer = createDrawerNavigator<NavigatorParamList>()
-const Stack = createNativeStackNavigator()
+const authStack = createNativeStackNavigator()
+const bottomStack = createBottomTabNavigator()
 
-const AppStack = () => {
-  const { authenticationStore } = useStores()
-
-  return (
-    <LeftDrawer.Navigator
-      id="LeftDrawer"
-      screenOptions={{
-        headerShown: false,
-        drawerPosition: "left",
-      }}
-      initialRouteName="demoMap"
-      drawerContent={(props) => (
-        <DrawerContentScrollView {...props}>
-          <DrawerItemList {...props} />
-          <DrawerItem label="Logout" onPress={() => authenticationStore.logout()} />
-        </DrawerContentScrollView>
-      )}
-    >
-      <LeftDrawer.Screen
-        name="demoMap"
-        component={DemoMapScreen}
-        options={{ drawerLabel: "Map" }}
-      />
-      <LeftDrawer.Screen
-        name="estia"
-        component={EstiaScreen}
-        options={{
-          drawerItemStyle: {
-            display: "none",
-          },
-        }}
-      />
-      <LeftDrawer.Screen
-        name="profile"
-        component={ProfileScreen}
-        options={{
-          drawerItemStyle: {
-            display: "none",
-          },
-        }}
-      />
-      {/** 🔥 Your screens go here */}
-    </LeftDrawer.Navigator>
-  )
-}
 const AuthStack = () => {
   return (
-    <Stack.Navigator
+    <authStack.Navigator
       screenOptions={{
         headerShown: false,
       }}
       initialRouteName="welcome"
     >
-      <Stack.Screen name="welcome" component={WelcomeScreen} />
-    </Stack.Navigator>
+      <authStack.Screen name="welcome" component={WelcomeScreen} />
+    </authStack.Navigator>
   )
 }
 
-const RightDrawerScreen = () => {
-  const { authenticationStore } = useStores()
+const AppStack = () => {
+  return (
+    <appStack.Navigator
+      id="appStack"
+      screenOptions={{
+        headerShown: false,
+      }}
+      initialRouteName="demoMap"
+    >
+      <appStack.Screen name="demoMap" component={TabNavigator} />
+      <appStack.Screen name="estia" component={EstiaScreen} />
+      <appStack.Screen name="profile" component={ProfileScreen} />
+      {/** 🔥 Your screens go here */}
+    </appStack.Navigator>
+  )
+}
+
+const DrawerContent = ({ navigation, state }) => {
+  const { authenticationStore, userStore } = useStores()
+  return (
+    <Drawer
+      header={<DrawerHeader url={userStore.user.avatarSrc} />}
+      selectedIndex={state.index}
+      onSelect={(index) => {
+        navigation.navigate(state.routeNames[index?.row])
+      }}
+    >
+      <DrawerItem title="Home" />
+      <DrawerItem title="Profile" />
+      <DrawerItem title="Logout" onPress={() => authenticationStore.logout()} />
+    </Drawer>
+  )
+}
+
+const LeftDrawerScreen = () => {
+  const MockLogout = () => {
+    return <></>
+  }
   return (
     <RightDrawer.Navigator
       initialRouteName="demoMap"
-      id="RightDrawer"
-      screenOptions={{ drawerPosition: "right", headerShown: false }}
-      drawerContent={() => (
-        <DrawerContentScrollView>
-          <DrawerItem label="Profile" onPress={() => navigate("profile")} />
-          <DrawerItem label="Logout" onPress={() => authenticationStore.logout()} />
-        </DrawerContentScrollView>
-      )}
+      id="leftDrawer"
+      screenOptions={{ drawerPosition: "left", headerShown: false }}
+      drawerContent={(props) => <DrawerContent {...props} />}
     >
-      <RightDrawer.Screen name="rightDrawer" component={AppStack} />
+      <RightDrawer.Screen name="demoMap" component={DemoMapScreen} />
+      <RightDrawer.Screen name="profile" component={ProfileScreen} />
+      <RightDrawer.Screen name="logout" component={MockLogout} />
     </RightDrawer.Navigator>
   )
 }
+const MapIcon = (props) => <Icon name="map" {...props} />
+const ListIcon = (props) => <Icon name="list" {...props} />
+const BottomTabBar = ({ navigation, state }) => {
+  return (
+    <BottomNavigation
+      selectedIndex={state.index}
+      onSelect={(index) => navigation.navigate(state.routeNames[index])}
+    >
+      <BottomNavigationTab icon={MapIcon} />
+      <BottomNavigationTab icon={ListIcon} />
+    </BottomNavigation>
+  )
+}
+
+const TabNavigator = () => (
+  <bottomStack.Navigator
+    screenOptions={{ headerShown: false }}
+    tabBar={(props) => <BottomTabBar {...props} />}
+  >
+    <bottomStack.Screen name="Map" component={LeftDrawerScreen} />
+    <bottomStack.Screen name="List" component={LeftDrawerScreen} />
+  </bottomStack.Navigator>
+)
 
 interface NavigationProps extends Partial<React.ComponentProps<typeof NavigationContainer>> {}
 
@@ -137,7 +161,7 @@ export const AppNavigator = observer((props: NavigationProps) => {
       theme={colorScheme === "dark" ? DarkTheme : DefaultTheme}
       {...props}
     >
-      {authenticationStore.isAuthenticationed ? <RightDrawerScreen /> : <AuthStack />}
+      {authenticationStore.isAuthenticationed ? <AppStack /> : <AuthStack />}
     </NavigationContainer>
   )
 })

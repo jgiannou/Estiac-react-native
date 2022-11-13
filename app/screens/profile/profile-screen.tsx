@@ -59,8 +59,7 @@ export const ProfileScreen: FC<StackScreenProps<NavigatorParamList, "profile">> 
           <Header
             headerTx="demoScreen.howTo"
             leftIcon="menu"
-            onLeftPress={() => navigation?.getParent("LeftDrawer").openDrawer()}
-            onRightPress={() => navigation?.getParent("RightDrawer").openDrawer()}
+            onLeftPress={() => navigation?.toggleDrawer()}
             rightIcon={"profile"}
             style={HEADER}
             titleStyle={HEADER_TITLE}

@@ -25,7 +25,6 @@ export class AuthenticationApi {
         "/api/auth/local/register",
         JSON.stringify(registerData),
       )
-      console.log(response)
 
       if (!response.ok) {
         const problem = getGeneralApiProblem(response)

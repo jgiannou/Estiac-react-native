@@ -20,7 +20,6 @@ export default function UploadImage() {
 
     if (!_image.cancelled) {
       setImage(_image.uri)
-      console.log(image)
       try {
         await userStore.uploadUserAvatar(image)
       } catch (error) {
@@ -31,14 +30,12 @@ export default function UploadImage() {
 
   const checkForCameraRollPermission = async () => {
     const { status } = await ImagePicker.getMediaLibraryPermissionsAsync()
-    console.log(status)
     if (status !== "granted") {
       alert("Please grant camera roll permissions inside your system's settings")
     } else {
       console.log("Media Permissions are granted")
     }
   }
-  console.log("fsdsdf")
 
   return (
     <View style={imageUploaderStyles.container}>

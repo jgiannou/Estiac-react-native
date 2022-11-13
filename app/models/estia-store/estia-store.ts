@@ -40,6 +40,8 @@ export const EstiaStoreModel = types
         address: "",
         avatar: "",
         photos: undefined,
+        price: undefined,
+        cover: "",
       }
     },
   }))
@@ -59,7 +61,6 @@ export const EstiaStoreModel = types
       self.resetEstia()
       const estiaApi = new EstiaApi(self.environment.api)
       const result = await estiaApi.getEstiaById(id)
-      console.log(result)
       if (result.kind === "ok") {
         self.saveEstia(result.estia)
       } else {

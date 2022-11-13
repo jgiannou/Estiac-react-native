@@ -12,7 +12,7 @@ import { StyledMapMarker } from "../../components/styled-map-marker/styled-map-m
 
 const FULL: ViewStyle = { flex: 1 }
 const CONTAINER: ViewStyle = {
-  backgroundColor: color.palette.white,
+  backgroundColor: "none",
   paddingHorizontal: spacing[4],
 }
 const BOLD: TextStyle = { fontWeight: "bold" }
@@ -35,6 +35,7 @@ const MAP_WRAPPER: ViewStyle = {
   justifyContent: "center",
 }
 const MAP: TextStyle = {
+  marginTop: 50,
   width: Dimensions.get("window").width,
   height: Dimensions.get("window").height,
 }
@@ -43,12 +44,6 @@ const LOADER_CONTAINER: ViewStyle = {
   flex: 1,
   justifyContent: "center",
   alignItems: "center",
-}
-
-const LOADER = {
-  flexDirection: "row",
-  justifyContent: "space-around",
-  padding: 10,
 }
 
 export const DemoMapScreen: FC<StackScreenProps<NavigatorParamList, "demoMap">> = observer(
@@ -78,7 +73,11 @@ export const DemoMapScreen: FC<StackScreenProps<NavigatorParamList, "demoMap">> 
           setErrorMsg("Permission to access location was denied")
           return
         }
-        let location = await Location.getCurrentPositionAsync({})
+        let location = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Balanced,
+
+          timeInterval: 5,
+        })
         setLocation(location)
       }
       const fetchStoreEstias = async () => {
@@ -91,16 +90,14 @@ export const DemoMapScreen: FC<StackScreenProps<NavigatorParamList, "demoMap">> 
       }
       fetchLocation()
       fetchStoreEstias()
-    }, [estiaStore.estias])
+    }, [])
     return (
       <View testID="DemoMapScreen" style={FULL}>
-        <GradientBackground colors={["#422443", "#281b34"]} />
-        <Screen style={CONTAINER} preset="scroll" backgroundColor={color.palette.white}>
+        <Screen style={CONTAINER} preset="scroll">
           <Header
             headerTx="demoScreen.howTo"
             leftIcon="menu"
-            onLeftPress={() => navigation.getParent("LeftDrawer").openDrawer()}
-            onRightPress={() => navigation.getParent("RightDrawer").openDrawer()}
+            onLeftPress={() => navigation.toggleDrawer()}
             rightIcon={"profile"}
             style={HEADER}
             titleStyle={HEADER_TITLE}
@@ -115,12 +112,234 @@ export const DemoMapScreen: FC<StackScreenProps<NavigatorParamList, "demoMap">> 
               <MapView
                 style={MAP}
                 provider={PROVIDER_GOOGLE}
+                customMapStyle={[
+                  {
+                    elementType: "geometry",
+                    stylers: [
+                      {
+                        color: "#ebe3cd",
+                      },
+                    ],
+                  },
+                  {
+                    elementType: "labels.text.fill",
+                    stylers: [
+                      {
+                        color: "#523735",
+                      },
+                    ],
+                  },
+                  {
+                    elementType: "labels.text.stroke",
+                    stylers: [
+                      {
+                        color: "#f5f1e6",
+                      },
+                    ],
+                  },
+                  {
+                    featureType: "administrative",
+                    elementType: "geometry.stroke",
+                    stylers: [
+                      {
+                        color: "#c9b2a6",
+                      },
+                    ],
+                  },
+                  {
+                    featureType: "administrative.land_parcel",
+                    elementType: "geometry.stroke",
+                    stylers: [
+                      {
+                        color: "#dcd2be",
+                      },
+                    ],
+                  },
+                  {
+                    featureType: "administrative.land_parcel",
+                    elementType: "labels.text.fill",
+                    stylers: [
+                      {
+                        color: "#ae9e90",
+                      },
+                    ],
+                  },
+                  {
+                    featureType: "landscape.natural",
+                    elementType: "geometry",
+                    stylers: [
+                      {
+                        color: "#dfd2ae",
+                      },
+                    ],
+                  },
+                  {
+                    featureType: "poi",
+                    elementType: "geometry",
+                    stylers: [
+                      {
+                        color: "#dfd2ae",
+                      },
+                    ],
+                  },
+                  {
+                    featureType: "poi",
+                    elementType: "labels.text.fill",
+                    stylers: [
+                      {
+                        color: "#93817c",
+                      },
+                    ],
+                  },
+                  {
+                    featureType: "poi.park",
+                    elementType: "geometry.fill",
+                    stylers: [
+                      {
+                        color: "#a5b076",
+                      },
+                    ],
+                  },
+                  {
+                    featureType: "poi.park",
+                    elementType: "labels.text.fill",
+                    stylers: [
+                      {
+                        color: "#447530",
+                      },
+                    ],
+                  },
+                  {
+                    featureType: "road",
+                    elementType: "geometry",
+                    stylers: [
+                      {
+                        color: "#f5f1e6",
+                      },
+                    ],
+                  },
+                  {
+                    featureType: "road.arterial",
+                    elementType: "geometry",
+                    stylers: [
+                      {
+                        color: "#fdfcf8",
+                      },
+                    ],
+                  },
+                  {
+                    featureType: "road.highway",
+                    elementType: "geometry",
+                    stylers: [
+                      {
+                        color: "#f8c967",
+                      },
+                    ],
+                  },
+                  {
+                    featureType: "road.highway",
+                    elementType: "geometry.stroke",
+                    stylers: [
+                      {
+                        color: "#e9bc62",
+                      },
+                    ],
+                  },
+                  {
+                    featureType: "road.highway.controlled_access",
+                    elementType: "geometry",
+                    stylers: [
+                      {
+                        color: "#e98d58",
+                      },
+                    ],
+                  },
+                  {
+                    featureType: "road.highway.controlled_access",
+                    elementType: "geometry.stroke",
+                    stylers: [
+                      {
+                        color: "#db8555",
+                      },
+                    ],
+                  },
+                  {
+                    featureType: "road.local",
+                    elementType: "labels.text.fill",
+                    stylers: [
+                      {
+                        color: "#806b63",
+                      },
+                    ],
+                  },
+                  {
+                    featureType: "transit.line",
+                    elementType: "geometry",
+                    stylers: [
+                      {
+                        color: "#dfd2ae",
+                      },
+                    ],
+                  },
+                  {
+                    featureType: "transit.line",
+                    elementType: "labels.text.fill",
+                    stylers: [
+                      {
+                        color: "#8f7d77",
+                      },
+                    ],
+                  },
+                  {
+                    featureType: "transit.line",
+                    elementType: "labels.text.stroke",
+                    stylers: [
+                      {
+                        color: "#ebe3cd",
+                      },
+                    ],
+                  },
+                  {
+                    featureType: "transit.station",
+                    elementType: "geometry",
+                    stylers: [
+                      {
+                        color: "#dfd2ae",
+                      },
+                    ],
+                  },
+                  {
+                    featureType: "water",
+                    elementType: "geometry.fill",
+                    stylers: [
+                      {
+                        color: "#b9d3c2",
+                      },
+                    ],
+                  },
+                  {
+                    featureType: "water",
+                    elementType: "labels.text.fill",
+                    stylers: [
+                      {
+                        color: "#92998d",
+                      },
+                    ],
+                  },
+                ]}
                 initialRegion={{
                   latitude: location?.coords?.latitude,
                   longitude: location?.coords?.longitude,
                   latitudeDelta: 0.0421,
                   longitudeDelta: 0.0421,
                 }}
+                showsCompass={true}
+                showsUserLocation={true}
+                userLocationAnnotationTitle={"asdasd"}
+                showsMyLocationButton={true}
+                followsUserLocation={true}
+                cacheEnabled
+                loadingEnabled
               >
                 <>
                   {estias.length > 0 &&

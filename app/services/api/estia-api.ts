@@ -40,7 +40,6 @@ export class EstiaApi {
         if (problem) return problem
       }
       const estia = estiaMapper(response?.data?.data)
-      console.log(estia)
       return { kind: "ok", estia }
     } catch (e) {
       __DEV__ && console.tron.log(e.message)
